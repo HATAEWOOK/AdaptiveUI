@@ -30,7 +30,7 @@ import eli5
 from eli5.sklearn import PermutationImportance
 
 train_pkl = 'Data\\data_merged(pid1to6).pkl'
-test_pkl = 'C:\\Users\\uvrlab\\Downloads\\Data for test\\Test\\data_merged_test.pkl'
+test_pkl = 'Data\\data_merged_test.pkl'
 
 models = [
     RidgeClassifier(alpha=1.0, solver="auto", random_state=42),
@@ -105,7 +105,6 @@ def dataload(fun='nn', mode='train', filepath = 'C:\\Users\\uvrlab\\Downloads\\D
 
     if mode == 'train':
         X_train, X_valid, y_train, y_valid = train_test_split(X, y, shuffle=True, random_state=77, test_size=0.2)
-
         return X_train, X_valid, y_train, y_valid, col
     if mode == 'test':
         return X, y
@@ -121,27 +120,30 @@ def build_1dnn(n_inputs, n_outputs):
 
 def y_to_multi_binary(y):
     y_social = np.where(y < 3, 0, 1)
+    y_social = np.expand_dims(y_social, axis = 1)
     y_mobile = np.where((y+1) % 3 == 0, 1, 0)
+    y_mobile = np.expand_dims(y_mobile, axis = 1)
     y_work = np.where(y % 3 == 0, 1, 0)
+    y_work = np.expand_dims(y_work, axis = 1)
+    print(y_social.shape)
 
     return [y_social, y_mobile, y_work]
 
 def binary_model(n_inputs):
     model = Sequential()
-    model.add(Dense(50, input_dims=n_inputs, kernel_initializer='he_uniform', activation='relu'))
+    model.add(Dense(50, input_dim=n_inputs, kernel_initializer='he_uniform', activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='adam')
     return model
 
 def train_binary():
-    X_train, X_valid, y_train, y_valid, col = dataload(mode='train', filepath=train_pkl)
-    print(np.unique(y_train))
+    X_train, X_valid, y_train, y_valid, col = dataload(fun='binary', mode='train', filepath=train_pkl)
     y_train_list = y_to_multi_binary(y_train)
     y_valid_list = y_to_multi_binary(y_valid)
-    print(X_train.shape)
-    for idx, y_train in enumerate(y_train_list):
+    for idx, y_condition in enumerate(y_train_list):
+        print("%d model!"%idx)
         model = binary_model(X_train.shape[1])
-        history = model.fit(X_train, y_train, verbose=1, epochs=100)
+        history = model.fit(X_train, y_condition, verbose=1, epochs=100)
         model.save('binary_model_%d.h5'%idx)
         plt.plot(history.history['loss'])
         plt.title('Model %d loss'%idx)
@@ -151,7 +153,22 @@ def train_binary():
         plt.savefig("loss_%d.png"%idx)
         plt.close()
         yhat = model.predict(X_valid)
+        yhat = yhat.round()
         acc = accuracy_score(y_valid_list[idx], yhat)
+        print('%d model acc> %3f'%(idx, acc))
+
+def test_binary():
+    X_test, y_test = dataload(fun='binary', mode='test', filepath=test_pkl)
+    y_test_list = y_to_multi_binary(y_test)
+    for idx, y_condition in enumerate(y_test_list):
+        print("%d model!"%idx)
+        model = binary_model(X_test.shape[1])
+        model = load_model('binary_model_%d.h5'%idx)
+        results = model.evaluate(X_test, y_condition, verbose=1)
+        model.save('binary_model_%d.h5'%idx)
+        yhat = model.predict(X_test)
+        yhat = yhat.round()
+        acc = accuracy_score(y_condition, yhat)
         print('%d model acc> %3f'%(idx, acc))
         
 
@@ -267,7 +284,31 @@ def test_ml(model):
     # print("Confusion matrix:\n", confusion_matrix(y_test, y_pred))
     # print("Classification report:\n", classification_report(y_test, y_pred))
 
+def train_and_test_binary(model):
+    print(model.__class__.__name__)
+    # train the model
+    X_train, X_valid, y_train, y_valid, col = dataload(fun='ml', mode='train', filepath=train_pkl)
+    y_train_list = y_to_multi_binary(y_train)
+    y_valid_list = y_to_multi_binary(y_valid)
+    for idx, y_condition in enumerate(y_train_list):
+        print("%d model!"%idx)
+        model.fit(X_train, y_condition)
+        yhat = model.predict(X_valid)
+        yhat = yhat.round()
+        acc = accuracy_score(y_valid_list[idx], yhat)
+        print('[train]%d model acc> %3f'%(idx, acc))
+
+    X_test, y_test = dataload(fun='ml', mode='test', filepath=test_pkl)
+    y_test_list = y_to_multi_binary(y_test)
+    for idx, y_condition in enumerate(y_test_list):
+        print("%d model!"%idx)
+        yhat = model.predict(X_test)
+        yhat = yhat.round()
+        acc = accuracy_score(y_condition, yhat)
+        print('[test]%d model test acc> %3f'%(idx, acc))
+
 
 
 if __name__ == '__main__':
-    train_binary()
+    for model in models:
+        train_and_test_binary(model)
