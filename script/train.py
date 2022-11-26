@@ -29,7 +29,7 @@ from sklearn.model_selection import cross_val_score
 import eli5
 from eli5.sklearn import PermutationImportance
 
-train_pkl = 'C:\\Users\\uvrlab\\Downloads\\Data for training and validation\\Training\\data_merged(pid1to6).pkl'
+train_pkl = 'Data\\data_merged(pid1to6).pkl'
 test_pkl = 'C:\\Users\\uvrlab\\Downloads\\Data for test\\Test\\data_merged_test.pkl'
 
 models = [
@@ -97,10 +97,12 @@ def dataload(fun='nn', mode='train', filepath = 'C:\\Users\\uvrlab\\Downloads\\D
     X = StandardScaler().fit_transform(X)
     y_ -= 1
     n_classes = 6
+
     if fun == 'nn':
         y = np_utils.to_categorical(y_, num_classes=n_classes)
     else:
         y = y_
+
     if mode == 'train':
         X_train, X_valid, y_train, y_valid = train_test_split(X, y, shuffle=True, random_state=77, test_size=0.2)
 
@@ -116,6 +118,42 @@ def build_1dnn(n_inputs, n_outputs):
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='binary_crossentropy', optimizer='adam')
     return model
+
+def y_to_multi_binary(y):
+    y_social = np.where(y < 3, 0, 1)
+    y_mobile = np.where((y+1) % 3 == 0, 1, 0)
+    y_work = np.where(y % 3 == 0, 1, 0)
+
+    return [y_social, y_mobile, y_work]
+
+def binary_model(n_inputs):
+    model = Sequential()
+    model.add(Dense(50, input_dims=n_inputs, kernel_initializer='he_uniform', activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
+
+def train_binary():
+    X_train, X_valid, y_train, y_valid, col = dataload(mode='train', filepath=train_pkl)
+    print(np.unique(y_train))
+    y_train_list = y_to_multi_binary(y_train)
+    y_valid_list = y_to_multi_binary(y_valid)
+    print(X_train.shape)
+    for idx, y_train in enumerate(y_train_list):
+        model = binary_model(X_train.shape[1])
+        history = model.fit(X_train, y_train, verbose=1, epochs=100)
+        model.save('binary_model_%d.h5'%idx)
+        plt.plot(history.history['loss'])
+        plt.title('Model %d loss'%idx)
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        plt.savefig("loss_%d.png"%idx)
+        plt.close()
+        yhat = model.predict(X_valid)
+        acc = accuracy_score(y_valid_list[idx], yhat)
+        print('%d model acc> %3f'%(idx, acc))
+        
 
 
 def train():
@@ -173,7 +211,7 @@ def train_and_test(model):
     y = df['condition']
     df.drop(["pid", "condition", "acc.x", "acc.y", "acc.z"], axis=1)
     # train the model
-    X_train, X_valid, y_train, y_valid, col = dataload(fun='svm', mode='train', filepath=train_pkl)
+    X_train, X_valid, y_train, y_valid, col = dataload(fun='ml', mode='train', filepath=train_pkl)
     model.fit(X_train, y_train)
     # get importance
     if model.__class__ in [
@@ -232,5 +270,4 @@ def test_ml(model):
 
 
 if __name__ == '__main__':
-    for model in models:
-        train_and_test(model)
+    train_binary()
