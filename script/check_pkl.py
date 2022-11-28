@@ -4,7 +4,7 @@ import os
 
 def window_mean():
     for condition in range(1, 7): #7
-        for pid in range(1, 8): #8
+        for pid in range(1, 10): #8
             WIN_SIZE = 2.5
             W = np.arange(72.5, 400, WIN_SIZE * 0.5)
             isFile = True
@@ -28,7 +28,163 @@ def window_mean():
             sampled_data['phone'].fillna(0, inplace=True)
             sampled_data['desktop'].fillna(0, inplace=True)
             sampled_data['laptop'].fillna(0, inplace=True)
-            sampled_data.to_pickle('sampled_P%d_C%d.pkl'%(pid, condition)) 
+            if condition == 1:
+                if pid == 1:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 2:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 3:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 4:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 5:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 6:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 0
+                elif pid == 7:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 8:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 9:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+            elif condition == 2:
+                if pid == 1:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 2:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 3:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 4:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 5:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 6:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 7:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 8:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 9:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+            elif condition == 3:
+                if pid == 1:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 2:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 3:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 4:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 5:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 6:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 7:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 8:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 9:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+            elif condition == 4:
+                if pid == 1:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 2:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 3:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 4:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 5:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 6:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+                elif pid == 7:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 8:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 1
+            elif condition == 5:
+                if pid == 1:
+                    sampled_data['arousal'] = 1
+                    sampled_data['valence'] = 1
+                elif pid == 2:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 3:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 2
+                elif pid == 4:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 2
+                elif pid == 5:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 6:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 7:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+            elif condition == 6:
+                if pid == 1:
+                    sampled_data['arousal'] = 2
+                    sampled_data['valence'] = 2
+                elif pid == 2:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 3:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 2
+                elif pid == 4:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 5:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 6:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 7:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+                elif pid == 8:
+                    sampled_data['arousal'] = 0
+                    sampled_data['valence'] = 1
+            sampled_data.to_pickle('.\\Data\\sampled_P%d_C%d.pkl'%(pid, condition)) 
 
 def window_conv1d():
     window_dataset = np.empty((1, 262, 473, 39))
@@ -72,4 +228,4 @@ def window_conv1d():
             # sampled_data['laptop'].fillna(0, inplace=True)
 
 if __name__ =="__main__":
-    window_conv1d()
+    window_mean()
